@@ -41,7 +41,7 @@ function App() {
   const getEmails = async (
     links: string[],
     emailCount: number,
-    linksPerRequest = 10
+    linksPerRequest = 6
   ) => {
     let startIndex = 0;
     let collectedEmails: data[] = [];
@@ -90,6 +90,7 @@ function App() {
         {
           params: {
             query: searchValues.search,
+            pageCount: 10,
           },
         }
       );
@@ -102,7 +103,7 @@ function App() {
 
   return (
     <>
-      <main className="dark bg-slate-950 text-white w-screen h-screen flex flex-col items-center justify-center gap-4">
+      <main className="dark bg-slate-950 text-white w-screen h-dvh flex flex-col items-center justify-center gap-4">
         <h1 className="text-4xl font-bold text-center">
           Buscar contactos agencias
         </h1>
@@ -147,17 +148,19 @@ function App() {
         <div className="flex justify-center items-center gap-4">
           {isLoading && <p>Cargando...</p>}
         </div>
-        <table className="table-auto ">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Email</th>
-              <th className="px-4 py-2">Origen</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data &&
-              data.map((item) => (
+        {data.length > 1 && (
+          <table className="table-auto ">
+            <thead>
+              <tr>
+                <th className="px-4 py-2">Item</th>
+                <th className="px-4 py-2">Email</th>
+                <th className="px-4 py-2">Origen</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((item, index: number) => (
                 <tr>
+                  <td className="border px-4 py-2">{index + 1}</td>
                   <td className="border px-4 py-2">{item.email}</td>
                   <td className="border px-4 py-2">
                     <a
@@ -171,8 +174,9 @@ function App() {
                   </td>
                 </tr>
               ))}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        )}
       </main>
     </>
   );
