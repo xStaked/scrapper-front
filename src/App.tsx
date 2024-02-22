@@ -12,6 +12,7 @@ import axios from "axios";
 
 interface data {
   email: string;
+  link: string;
 }
 
 function App() {
@@ -146,28 +147,32 @@ function App() {
         <div className="flex justify-center items-center gap-4">
           {isLoading && <p>Cargando...</p>}
         </div>
-        <div
-          className="
-          flex
-          flex-col
-          gap-4
-          w-full
-          justify-center
-          items-center
-          dark
-          overflow-y-auto
-          h-1/2
-          overflow-x-hidden
-          scrollbar-hide
-          "
-        >
-          {data &&
-            data.map((item, index) => (
-              <div key={index} className="flex flex-col gap-4">
-                <p>{item.email}</p>
-              </div>
-            ))}
-        </div>
+        <table className="table-auto ">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data &&
+              data.map((item) => (
+                <tr>
+                  <td className="border px-4 py-2">{item.email}</td>
+                  <td className="border px-4 py-2">
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-400 underline"
+                    >
+                      {item.link}
+                    </a>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </main>
     </>
   );
