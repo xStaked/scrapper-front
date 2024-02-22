@@ -12,6 +12,7 @@ import axios from "axios";
 
 interface data {
   email: string;
+  link: string;
 }
 
 function App() {
@@ -45,35 +46,45 @@ function App() {
     let startIndex = 0;
     let collectedEmails: data[] = [];
 
-    while (collectedEmails.length < emailCount && startIndex < links.length) {
-      const endIndex = Math.min(startIndex + linksPerRequest, links.length);
-      const currentLinks = links.slice(startIndex, endIndex);
+    try {
+      while (collectedEmails.length < emailCount && startIndex < links.length) {
+        const endIndex = Math.min(startIndex + linksPerRequest, links.length);
+        const currentLinks = links.slice(startIndex, endIndex);
 
-      const data = await fetch(
-        "https://l2ojdnzfnb.execute-api.us-east-1.amazonaws.com/default/scraping-agencias",
-        {
-          method: "POST",
-          body: JSON.stringify({ links: currentLinks }),
+        const data = await fetch(
+          "https://l2ojdnzfnb.execute-api.us-east-1.amazonaws.com/default/scraping-agencias",
+          {
+            method: "POST",
+            body: JSON.stringify({ links: currentLinks }),
+          }
+        ).then((res) => res.json());
+
+        if (data && data.emails && Array.isArray(data.emails)) {
+          const uniqueEmailsSet = new Set([...collectedEmails, ...data.emails]);
+          console.log(uniqueEmailsSet);
+          collectedEmails = [...uniqueEmailsSet];
+
+          setData(collectedEmails);
         }
-      ).then((res) => res.json());
 
-      if (data && data.emails && Array.isArray(data.emails)) {
-        collectedEmails = [...collectedEmails, ...data.emails];
-        setData(collectedEmails);
+        startIndex += linksPerRequest;
+
+        if (!data || !data.emails || !Array.isArray(data.emails)) {
+          console.log("Error fetching emails");
+        }
       }
+    } catch (error) {
+      console.error(error);
 
-      startIndex += linksPerRequest;
-
-      if (!data || !data.emails || !Array.isArray(data.emails)) {
-        console.log("Error fetching emails");
-        break;
-      }
+      console.log("Reintentando con los mismos links.");
     }
+    links = links.slice(linksPerRequest);
   };
 
   const getEmailElements = async () => {
     try {
       setIsLoading(true);
+      setData([]);
       const { data: dataLinks } = await axios.get(
         "https://o6v44dvk2k.execute-api.us-east-1.amazonaws.com/default/scraping-links-agencias",
         {
@@ -125,35 +136,43 @@ function App() {
             </SelectContent>
           </Select>
 
-          <Button variant="secondary" onClick={getEmailElements}>
-            Search
+          <Button
+            variant="secondary"
+            onClick={getEmailElements}
+            disabled={isLoading}
+          >
+            Buscar
           </Button>
         </div>
         <div className="flex justify-center items-center gap-4">
-          {isLoading && <p>Loading...</p>}
+          {isLoading && <p>Cargando...</p>}
         </div>
-        <div
-          className="
-          flex
-          flex-col
-          gap-4
-          w-full
-          justify-center
-          items-center
-          dark
-          overflow-y-auto
-          h-1/2
-          overflow-x-hidden
-          scrollbar-hide
-          "
-        >
-          {data &&
-            data.map((item, index) => (
-              <div key={index} className="flex flex-col gap-4">
-                <p>{item.email}</p>
-              </div>
-            ))}
-        </div>
+        <table className="table-auto ">
+          <thead>
+            <tr>
+              <th className="px-4 py-2">Email</th>
+              <th className="px-4 py-2">Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data &&
+              data.map((item) => (
+                <tr>
+                  <td className="border px-4 py-2">{item.email}</td>
+                  <td className="border px-4 py-2">
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-400 underline"
+                    >
+                      {item.link}
+                    </a>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
+        </table>
       </main>
     </>
   );
