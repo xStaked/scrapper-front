@@ -21,7 +21,6 @@ function App() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<data[]>([]);
-  const [links, setLinks] = useState<string[]>([]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValues({
@@ -83,8 +82,7 @@ function App() {
           },
         }
       );
-      setLinks(dataLinks);
-      await getEmails(links, searchValues.limit);
+      await getEmails(dataLinks, searchValues.limit);
     } catch (error) {
       console.error(error);
     }
