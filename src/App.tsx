@@ -23,6 +23,9 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState<data[]>([]);
 
+  const getLinksUrl = import.meta.env.VITE_APP_GET_LINKS;
+  const getEmailsUrl = import.meta.env.VITE_APP_GET_EMAILS;
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValues({
       ...searchValues,
@@ -51,13 +54,10 @@ function App() {
         const endIndex = Math.min(startIndex + linksPerRequest, links.length);
         const currentLinks = links.slice(startIndex, endIndex);
 
-        const data = await fetch(
-          "https://l2ojdnzfnb.execute-api.us-east-1.amazonaws.com/default/scraping-agencias",
-          {
-            method: "POST",
-            body: JSON.stringify({ links: currentLinks }),
-          }
-        ).then((res) => res.json());
+        const data = await fetch(getEmailsUrl, {
+          method: "POST",
+          body: JSON.stringify({ links: currentLinks }),
+        }).then((res) => res.json());
 
         if (data && data.emails && Array.isArray(data.emails)) {
           const uniqueEmailsSet = new Set([...collectedEmails, ...data.emails]);
@@ -85,15 +85,12 @@ function App() {
     try {
       setIsLoading(true);
       setData([]);
-      const { data: dataLinks } = await axios.get(
-        "https://o6v44dvk2k.execute-api.us-east-1.amazonaws.com/default/scraping-links-agencias",
-        {
-          params: {
-            query: searchValues.search,
-            pageCount: 10,
-          },
-        }
-      );
+      const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
+        params: {
+          query: searchValues.search,
+          pageCount: 10,
+        },
+      });
       await getEmails(dataLinks, searchValues.limit);
     } catch (error) {
       console.error(error);
@@ -103,24 +100,15 @@ function App() {
 
   return (
     <>
-      <main className="dark bg-slate-950 text-white w-screen h-dvh flex flex-col items-center justify-center gap-4">
-        <h1 className="text-4xl font-bold text-center">
+      <main className="dark bg-slate-950 text-white w-screen h-dvh flex flex-col items-center  gap-4">
+        <h1 className="text-4xl font-bold text-center mt-4">
           Buscar contactos agencias
         </h1>
-        <div
-          className="
-          flex
-          gap-4
-          w-full
-          justify-center
-          items-center
-          dark
-        "
-        >
+        <div className="flex gap-4 w-full  justify-center dark mt-4 ">
           <Input
             type="text"
             className="w-1/2"
-            placeholder="Search for something"
+            placeholder="Buscar agencias"
             onChange={handleSearch}
           />
           <Select
@@ -145,7 +133,7 @@ function App() {
             Buscar
           </Button>
         </div>
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex justify-start items-start gap-4">
           {isLoading && <p>Cargando...</p>}
         </div>
         {data.length > 1 && (
