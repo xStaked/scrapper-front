@@ -8,12 +8,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import axios from "axios";
+
+interface data {
+  email: string;
+}
 
 function App() {
   const [searchValues, setSearchValues] = useState({
     search: "",
     limit: 10,
   });
+  const [isLoading, setIsLoading] = useState(false);
+  const [data, setData] = useState<data[]>([]);
+  const [links, setLinks] = useState<string[]>([]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValues({
@@ -30,10 +38,65 @@ function App() {
     });
   };
 
+  const getEmails = async (
+    links: string[],
+    emailCount: number,
+    linksPerRequest = 10
+  ) => {
+    let startIndex = 0;
+    let collectedEmails: data[] = [];
+
+    while (collectedEmails.length < emailCount && startIndex < links.length) {
+      const endIndex = Math.min(startIndex + linksPerRequest, links.length);
+      const currentLinks = links.slice(startIndex, endIndex);
+
+      const data = await fetch(
+        "https://l2ojdnzfnb.execute-api.us-east-1.amazonaws.com/default/scraping-agencias",
+        {
+          method: "POST",
+          body: JSON.stringify({ links: currentLinks }),
+        }
+      ).then((res) => res.json());
+
+      if (data && data.emails && Array.isArray(data.emails)) {
+        collectedEmails = [...collectedEmails, ...data.emails];
+        setData(collectedEmails);
+      }
+
+      startIndex += linksPerRequest;
+
+      if (!data || !data.emails || !Array.isArray(data.emails)) {
+        console.log("Error fetching emails");
+        break;
+      }
+    }
+  };
+
+  const getEmailElements = async () => {
+    try {
+      setIsLoading(true);
+      const { data: dataLinks } = await axios.get(
+        "https://o6v44dvk2k.execute-api.us-east-1.amazonaws.com/default/scraping-links-agencias",
+        {
+          params: {
+            query: searchValues.search,
+          },
+        }
+      );
+      setLinks(dataLinks);
+      await getEmails(links, searchValues.limit);
+    } catch (error) {
+      console.error(error);
+    }
+    setIsLoading(false);
+  };
+
   return (
     <>
       <main className="dark bg-slate-950 text-white w-screen h-screen flex flex-col items-center justify-center gap-4">
-        <h1 className="text-4xl font-bold text-center">Scrapper front</h1>
+        <h1 className="text-4xl font-bold text-center">
+          Buscar contactos agencias
+        </h1>
         <div
           className="
           flex
@@ -64,7 +127,34 @@ function App() {
             </SelectContent>
           </Select>
 
-          <Button variant="secondary">Search</Button>
+          <Button variant="secondary" onClick={getEmailElements}>
+            Search
+          </Button>
+        </div>
+        <div className="flex justify-center items-center gap-4">
+          {isLoading && <p>Loading...</p>}
+        </div>
+        <div
+          className="
+          flex
+          flex-col
+          gap-4
+          w-full
+          justify-center
+          items-center
+          dark
+          overflow-y-auto
+          h-1/2
+          overflow-x-hidden
+          scrollbar-hide
+          "
+        >
+          {data &&
+            data.map((item, index) => (
+              <div key={index} className="flex flex-col gap-4">
+                <p>{item.email}</p>
+              </div>
+            ))}
         </div>
       </main>
     </>
