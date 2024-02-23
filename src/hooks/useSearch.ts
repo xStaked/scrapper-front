@@ -83,7 +83,6 @@ export const useSearch = () => {
               return !isDuplicate;
             });
 
-            // compare currentlinks with links in response and add those ones to linksWithNoEmails
             const linksInResponse = data.emails.map(
               (email: data) => email.link
             );
@@ -122,6 +121,7 @@ export const useSearch = () => {
       setIsLoading(true);
       setDataEmails([]);
       setLinks([]);
+      setLinksWithNoEmails([]);
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
