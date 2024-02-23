@@ -27,16 +27,17 @@ function App() {
     handleShowAllLinksWithNoEmails,
     links,
     options,
+    linksWithNoEmails,
   } = useSearch();
 
   return (
     <>
       <main
         className={`dark bg-slate-950 text-white ${
-          dataEmails.length > 12 || options.showAllLinks
+          dataEmails.length > 12 || (options.showAllLinks && links.length > 0)
             ? "h-[100%]"
             : "h-screen"
-        }  flex flex-col items-center gap-4`}
+        }  flex flex-col items-center gap-4 pb-2`}
       >
         <h1 className="text-4xl font-bold text-center mt-4">
           Buscar contactos agencias
@@ -143,13 +144,48 @@ function App() {
             </tbody>
           </table>
         )}
-        {links.length > 0 && options.showAllLinks && (
+        {linksWithNoEmails.length > 0 && options.showAllLinksWithNoEmails && (
           <>
-            <table>
+            <h2 className="text-2xl font-bold text-center mt-4">
+              Links sin emails
+            </h2>
+            <table className="table-auto  w-[500px] my-3">
               <thead>
                 <tr>
                   <th className="px-4 py-2">Item</th>
-                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Origen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {linksWithNoEmails.map((link, index) => (
+                  <tr key={link}>
+                    <td className="border px-4 py-2">{index + 1}</td>
+                    <td className="border px-4 py-2">
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-400 underline"
+                      >
+                        {link}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+
+        {links.length > 0 && options.showAllLinks && (
+          <>
+            <h2 className="text-2xl font-bold text-center mt-4">
+              Todos los links
+            </h2>
+            <table className="table-auto  w-[500px] my-3">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Item</th>
                   <th className="px-4 py-2">Origen</th>
                 </tr>
               </thead>
@@ -157,7 +193,6 @@ function App() {
                 {links.map((link, index) => (
                   <tr key={link}>
                     <td className="border px-4 py-2">{index + 1}</td>
-                    <td className="border px-4 py-2">-</td>
                     <td className="border px-4 py-2">
                       <a
                         href={link}
