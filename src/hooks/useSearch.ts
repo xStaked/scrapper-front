@@ -18,7 +18,7 @@ export const useSearch = () => {
     showAllLinksWithNoEmails: false,
   });
   const [links, setLinks] = useState<string[]>([]);
-
+  const [linksWithNoEmails, setLinksWithNoEmails] = useState<string[]>([]);
   const getLinksUrl = import.meta.env.VITE_APP_GET_LINKS;
   const getEmailsUrl = import.meta.env.VITE_APP_GET_EMAILS;
 
@@ -56,6 +56,7 @@ export const useSearch = () => {
     linksPerRequest: number = 6
   ) => {
     let collectedEmails: data[] = [];
+    let linksWithNoEmails: string[] = [];
     while (dataEmails.length < emailCount) {
       const currentLinks = links.slice(0, emailCount - collectedEmails.length);
       try {
@@ -82,8 +83,26 @@ export const useSearch = () => {
               return !isDuplicate;
             });
 
+            // compare currentlinks with links in response and add those ones to linksWithNoEmails
+            const linksInResponse = data.emails.map(
+              (email: data) => email.link
+            );
+            const linksInResponseSet = new Set(linksInResponse);
+            const linksInCurrentLinks = currentLinks.filter((link) => {
+              return !linksInResponseSet.has(link);
+            });
+            linksWithNoEmails = [...linksWithNoEmails, ...linksInCurrentLinks];
             collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
+
             setDataEmails(collectedEmails);
+            setLinksWithNoEmails(linksWithNoEmails);
+          } else {
+            currentLinks.forEach((link) => {
+              if (!linksWithNoEmails.includes(link)) {
+                linksWithNoEmails.push(link);
+              }
+            });
+            console.log("entro");
           }
         }
 
@@ -102,10 +121,11 @@ export const useSearch = () => {
     try {
       setIsLoading(true);
       setDataEmails([]);
+      setLinks([]);
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
-          pageCount: 10,
+          pageCount: 15,
         },
       });
       setLinks(dataLinks);
@@ -129,5 +149,6 @@ export const useSearch = () => {
     handleShowAllLinks,
     handleShowAllLinksWithNoEmails,
     links,
+    linksWithNoEmails,
   };
 };
