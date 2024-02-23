@@ -7,6 +7,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Label } from "./components/ui/label";
 import { useSearch } from "./hooks/useSearch";
 
 function App() {
@@ -17,13 +23,19 @@ function App() {
     searchValues,
     getEmailElements,
     isLoading,
+    handleShowAllLinks,
+    handleShowAllLinksWithNoEmails,
+    links,
+    options,
   } = useSearch();
 
   return (
     <>
       <main
         className={`dark bg-slate-950 text-white ${
-          dataEmails.length > 12 ? "h-[100%]" : "h-screen"
+          dataEmails.length > 12 || options.showAllLinks
+            ? "h-[100%]"
+            : "h-screen"
         }  flex flex-col items-center gap-4`}
       >
         <h1 className="text-4xl font-bold text-center mt-4">
@@ -49,6 +61,47 @@ function App() {
               <SelectItem value="30">30</SelectItem>
             </SelectContent>
           </Select>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline">Opciones</Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-80">
+              <div className="grid gap-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium leading-none">Options</h4>
+                  <p className="text-sm text-muted-foreground">
+                    Mostrar opciones adicionales
+                  </p>
+                </div>
+                <div className="grid gap-2">
+                  <div className="grid grid-cols-4 items-center gap-2">
+                    <Label htmlFor="showAllLinks">
+                      Mostrar todos los links
+                    </Label>
+                    <Input
+                      id="showAllLinks"
+                      type="checkbox"
+                      defaultChecked
+                      onChange={handleShowAllLinks}
+                      className="col-span-2 h-8"
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 items-center gap-4">
+                    <Label htmlFor="showAlllinksWithNoEmails">
+                      Mostrar links sin emails
+                    </Label>
+                    <Input
+                      id="showAlllinksWithNoEmails"
+                      type="checkbox"
+                      onChange={handleShowAllLinksWithNoEmails}
+                      className="col-span-2 h-8"
+                    />
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
 
           <Button
             variant="secondary"
@@ -89,6 +142,37 @@ function App() {
               ))}
             </tbody>
           </table>
+        )}
+        {links.length > 0 && options.showAllLinks && (
+          <>
+            <table>
+              <thead>
+                <tr>
+                  <th className="px-4 py-2">Item</th>
+                  <th className="px-4 py-2">Email</th>
+                  <th className="px-4 py-2">Origen</th>
+                </tr>
+              </thead>
+              <tbody>
+                {links.map((link, index) => (
+                  <tr key={link}>
+                    <td className="border px-4 py-2">{index + 1}</td>
+                    <td className="border px-4 py-2">-</td>
+                    <td className="border px-4 py-2">
+                      <a
+                        href={link}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-blue-400 underline"
+                      >
+                        {link}
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
         )}
       </main>
     </>

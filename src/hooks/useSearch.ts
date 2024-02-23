@@ -13,6 +13,11 @@ export const useSearch = () => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [dataEmails, setDataEmails] = useState<data[]>([]);
+  const [options, setOptions] = useState({
+    showAllLinks: true,
+    showAllLinksWithNoEmails: false,
+  });
+  const [links, setLinks] = useState<string[]>([]);
 
   const getLinksUrl = import.meta.env.VITE_APP_GET_LINKS;
   const getEmailsUrl = import.meta.env.VITE_APP_GET_EMAILS;
@@ -25,10 +30,23 @@ export const useSearch = () => {
   };
 
   const handleLimit = (value: string) => {
-    console.log(value);
     setSearchValues({
       ...searchValues,
       limit: parseInt(value),
+    });
+  };
+
+  const handleShowAllLinks = () => {
+    setOptions({
+      ...options,
+      showAllLinks: !options.showAllLinks,
+    });
+  };
+
+  const handleShowAllLinksWithNoEmails = () => {
+    setOptions({
+      ...options,
+      showAllLinksWithNoEmails: !options.showAllLinksWithNoEmails,
     });
   };
 
@@ -90,7 +108,7 @@ export const useSearch = () => {
           pageCount: 10,
         },
       });
-
+      setLinks(dataLinks);
       await getEmails(dataLinks, searchValues.limit);
     } catch (error) {
       console.error(error);
@@ -107,5 +125,9 @@ export const useSearch = () => {
     handleSearch,
     handleLimit,
     getEmailElements,
+    options,
+    handleShowAllLinks,
+    handleShowAllLinksWithNoEmails,
+    links,
   };
 };
