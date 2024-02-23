@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Input } from "./components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -8,99 +7,25 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import axios from "axios";
-
-interface data {
-  email: string;
-  link: string;
-}
+import { useSearch } from "./hooks/useSearch";
 
 function App() {
-  const [searchValues, setSearchValues] = useState({
-    search: "",
-    limit: 10,
-  });
-  const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState<data[]>([]);
-
-  const getLinksUrl = import.meta.env.VITE_APP_GET_LINKS;
-  const getEmailsUrl = import.meta.env.VITE_APP_GET_EMAILS;
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchValues({
-      ...searchValues,
-      search: e.target.value,
-    });
-  };
-
-  const handleLimit = (value: string) => {
-    console.log(value);
-    setSearchValues({
-      ...searchValues,
-      limit: parseInt(value),
-    });
-  };
-
-  const getEmails = async (
-    links: string[],
-    emailCount: number,
-    linksPerRequest = 6
-  ) => {
-    let startIndex = 0;
-    let collectedEmails: data[] = [];
-
-    try {
-      while (collectedEmails.length < emailCount && startIndex < links.length) {
-        const endIndex = Math.min(startIndex + linksPerRequest, links.length);
-        const currentLinks = links.slice(startIndex, endIndex);
-
-        const data = await fetch(getEmailsUrl, {
-          method: "POST",
-          body: JSON.stringify({ links: currentLinks }),
-        }).then((res) => res.json());
-
-        if (data && data.emails && Array.isArray(data.emails)) {
-          const uniqueEmailsSet = new Set([...collectedEmails, ...data.emails]);
-          console.log(uniqueEmailsSet);
-          collectedEmails = [...uniqueEmailsSet];
-
-          setData(collectedEmails);
-        }
-
-        startIndex += linksPerRequest;
-
-        if (!data || !data.emails || !Array.isArray(data.emails)) {
-          console.log("Error fetching emails");
-        }
-      }
-    } catch (error) {
-      console.error(error);
-
-      console.log("Reintentando con los mismos links.");
-    }
-    links = links.slice(linksPerRequest);
-  };
-
-  const getEmailElements = async () => {
-    try {
-      setIsLoading(true);
-      setData([]);
-      const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
-        params: {
-          query: searchValues.search,
-          pageCount: 10,
-        },
-      });
-      await getEmails(dataLinks, searchValues.limit);
-    } catch (error) {
-      console.error(error);
-    }
-    setIsLoading(false);
-  };
+  const {
+    dataEmails,
+    handleSearch,
+    handleLimit,
+    searchValues,
+    getEmailElements,
+    isLoading,
+  } = useSearch();
 
   return (
     <>
-      <main className="dark bg-slate-950 text-white w-screen h-dvh flex flex-col items-center  gap-4">
+      <main
+        className={`dark bg-slate-950 text-white ${
+          dataEmails.length > 12 ? "h-[100%]" : "h-screen"
+        }  flex flex-col items-center gap-4`}
+      >
         <h1 className="text-4xl font-bold text-center mt-4">
           Buscar contactos agencias
         </h1>
@@ -134,10 +59,10 @@ function App() {
           </Button>
         </div>
         <div className="flex justify-start items-start gap-4">
-          {isLoading && <p>Cargando...</p>}
+          {isLoading && <p>Buscando...</p>}
         </div>
-        {data.length > 1 && (
-          <table className="table-auto ">
+        {dataEmails.length > 1 && (
+          <table className="table-auto w-[1000px] my-3">
             <thead>
               <tr>
                 <th className="px-4 py-2">Item</th>
@@ -146,8 +71,8 @@ function App() {
               </tr>
             </thead>
             <tbody>
-              {data.map((item, index: number) => (
-                <tr>
+              {dataEmails.map((item, index: number) => (
+                <tr key={item.email}>
                   <td className="border px-4 py-2">{index + 1}</td>
                   <td className="border px-4 py-2">{item.email}</td>
                   <td className="border px-4 py-2">
