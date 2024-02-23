@@ -36,6 +36,7 @@ function App() {
     links,
     options,
     linksWithNoEmails,
+    copyToClipboard,
   } = useSearch();
 
   return (
@@ -44,7 +45,7 @@ function App() {
         className={`dark bg-slate-950 text-white ${
           dataEmails.length > 12 || (options.showAllLinks && links.length > 0)
             ? "h-[100%]"
-            : "h-[100%]"
+            : "h-screen"
         }  flex flex-col items-center gap-4 pb-2`}
       >
         <h1 className="text-4xl font-bold text-center mt-4">
@@ -139,7 +140,15 @@ function App() {
                 {dataEmails.map((item, index: number) => (
                   <TableRow key={item.email}>
                     <TableCell>{index + 1}</TableCell>
-                    <TableCell>{item.email}</TableCell>
+                    <TableCell className="flex items-center gap-1">
+                      {item.email}
+                      <Button
+                        onClick={() => copyToClipboard(item.email)}
+                        className="text-white bg-slate-900 hover:bg-slate-800"
+                      >
+                        <i className="fa-solid fa-copy"></i>
+                      </Button>
+                    </TableCell>
                     <TableCell>
                       <a
                         href={item.link}

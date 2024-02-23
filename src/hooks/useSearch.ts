@@ -136,6 +136,10 @@ export const useSearch = () => {
     setIsLoading(false);
   };
 
+  const copyToClipboard = async (text: string) => {
+    await navigator.clipboard.writeText(text);
+  };
+
   return {
     dataEmails,
     setDataEmails,
@@ -150,5 +154,6 @@ export const useSearch = () => {
     handleShowAllLinksWithNoEmails,
     links,
     linksWithNoEmails,
+    copyToClipboard,
   };
 };
