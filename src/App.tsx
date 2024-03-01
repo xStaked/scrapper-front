@@ -38,6 +38,7 @@ function App() {
     options,
     linksWithNoEmails,
     copyToClipboard,
+    copyToClipboardAllEmails,
   } = useSearch();
 
   return (
@@ -145,7 +146,15 @@ function App() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="px-4 py-2">Item</TableHead>
-                  <TableHead className="px-4 py-2">Email</TableHead>
+                  <TableHead className="px-4 py-2 flex gap-4 items-center">
+                    Email
+                    <Button
+                      onClick={copyToClipboardAllEmails}
+                      className="text-white bg-slate-900 hover:bg-slate-800"
+                    >
+                      <i className="fa-solid fa-copy"></i>
+                    </Button>
+                  </TableHead>
                   <TableHead className="px-4 py-2">Origen</TableHead>
                 </TableRow>
               </TableHeader>
