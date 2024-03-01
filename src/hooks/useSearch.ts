@@ -154,6 +154,11 @@ export const useSearch = () => {
     await navigator.clipboard.writeText(text);
   };
 
+  const copyToClipboardAllEmails = async () => {
+    const emails = dataEmails.map((email) => email.email).join(", ");
+    await navigator.clipboard.writeText(emails);
+  }
+
   return {
     dataEmails,
     setDataEmails,
@@ -170,5 +175,6 @@ export const useSearch = () => {
     linksWithNoEmails,
     copyToClipboard,
     handleKeepSearching,
+    copyToClipboardAllEmails,
   };
 };
