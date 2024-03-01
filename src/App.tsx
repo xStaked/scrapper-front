@@ -33,6 +33,7 @@ function App() {
     isLoading,
     handleShowAllLinks,
     handleShowAllLinksWithNoEmails,
+    handleKeepSearching,
     links,
     options,
     linksWithNoEmails,
@@ -51,7 +52,7 @@ function App() {
         <h1 className="text-4xl font-bold text-center mt-4">
           Buscar contactos agencias
         </h1>
-        <div className="flex gap-4 w-full  justify-center dark mt-4 ">
+        <div className="flex flex-row gap-4 w-full  justify-center dark mt-4 ">
           <Input
             type="text"
             className="w-1/2"
@@ -85,7 +86,7 @@ function App() {
                   </p>
                 </div>
                 <div className="grid gap-2">
-                  <div className="grid grid-cols-4 items-center gap-2">
+                  <div className="grid grid-cols-3 items-center gap-2">
                     <Label htmlFor="showAllLinks">
                       Mostrar todos los links
                     </Label>
@@ -108,6 +109,18 @@ function App() {
                       onChange={handleShowAllLinksWithNoEmails}
                       checked={options.showAllLinksWithNoEmails}
                       className="col-span-2 h-8"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label htmlFor="showAlllinksWithNoEmails">
+                      Seguir buscando hasta que se acaben los links
+                    </Label>
+                    <Input
+                      id="showAlllinksWithNoEmails"
+                      type="checkbox"
+                      onChange={handleKeepSearching}
+                      checked={options.keepSearching}
+                      className="col-span-1 h-8"
                     />
                   </div>
                 </div>

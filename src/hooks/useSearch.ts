@@ -11,14 +11,16 @@ export const useSearch = () => {
     search: "",
     limit: 10,
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [dataEmails, setDataEmails] = useState<data[]>([]);
   const [options, setOptions] = useState({
     showAllLinks: true,
     showAllLinksWithNoEmails: false,
+    keepSearching: false,
   });
   const [links, setLinks] = useState<string[]>([]);
   const [linksWithNoEmails, setLinksWithNoEmails] = useState<string[]>([]);
+
   const getLinksUrl = import.meta.env.VITE_APP_GET_LINKS;
   const getEmailsUrl = import.meta.env.VITE_APP_GET_EMAILS;
 
@@ -50,14 +52,27 @@ export const useSearch = () => {
     });
   };
 
+  const handleKeepSearching = () => {
+    setOptions({
+      ...options,
+      keepSearching: !options.keepSearching,
+    });
+  };
+
   const getEmails = async (
     links: string[],
     emailCount: number,
-    linksPerRequest: number = 6
+    linksPerRequest: number = 4
   ) => {
     let collectedEmails: data[] = [];
     let linksWithNoEmails: string[] = [];
-    while (dataEmails.length < emailCount) {
+    let hasMoreLinks = true;
+
+    if (options.keepSearching) {
+      emailCount = 999;
+    }
+
+    while (hasMoreLinks && collectedEmails.length < emailCount) {
       const currentLinks = links.slice(0, emailCount - collectedEmails.length);
       try {
         const chunks = [];
@@ -65,6 +80,7 @@ export const useSearch = () => {
         for (let i = 0; i < currentLinks.length; i += linksPerRequest) {
           chunks.push(currentLinks.slice(i, i + linksPerRequest));
         }
+
         const responses = await Promise.all(
           chunks.map((chunk) =>
             fetch(getEmailsUrl, {
@@ -105,9 +121,7 @@ export const useSearch = () => {
           }
         }
 
-        if (collectedEmails.length >= emailCount) {
-          break;
-        }
+        hasMoreLinks = currentLinks.length > 0;
       } catch (error) {
         console.log(error);
       }
@@ -125,7 +139,7 @@ export const useSearch = () => {
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
-          pageCount: 15,
+          pageCount: 17,
         },
       });
       setLinks(dataLinks);
@@ -155,5 +169,6 @@ export const useSearch = () => {
     links,
     linksWithNoEmails,
     copyToClipboard,
+    handleKeepSearching,
   };
 };
