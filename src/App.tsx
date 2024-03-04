@@ -20,8 +20,17 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Label } from "./components/ui/label";
 import { useSearch } from "./hooks/useSearch";
+import { useState } from "react";
 
 function App() {
   const {
@@ -40,6 +49,19 @@ function App() {
     copyToClipboard,
     copyToClipboardAllEmails,
   } = useSearch();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentLinks = links.slice(indexOfFirstItem, indexOfLastItem);
+  const numberOfPages = Math.ceil(links.length / itemsPerPage);
+
+  const paginateLinks = (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > numberOfPages) return;
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <>
@@ -200,7 +222,7 @@ function App() {
                     <TableHead className="px-4 py-2">Origen</TableHead>
                   </TableRow>
                 </TableHeader>
-                <tbody>
+                <TableBody>
                   {linksWithNoEmails.map((link, index) => (
                     <TableRow key={link}>
                       <TableCell>{index + 1}</TableCell>
@@ -216,7 +238,7 @@ function App() {
                       </TableCell>
                     </TableRow>
                   ))}
-                </tbody>
+                </TableBody>
               </Table>
             </div>
           </>
@@ -226,15 +248,15 @@ function App() {
             <h2 className="text-2xl font-bold text-center mt-4">
               Todos los links
             </h2>
-            <table className="w-[70%] my-3">
+            <Table className="w-[70%] my-3">
               <TableHeader>
                 <TableRow>
                   <TableHead className="px-4 py-2">Item</TableHead>
                   <TableHead className="px-4 py-2">Origen</TableHead>
                 </TableRow>
               </TableHeader>
-              <tbody>
-                {links.map((link, index) => (
+              <TableBody>
+                {currentLinks.map((link, index) => (
                   <TableRow key={link}>
                     <TableCell>{index + 1}</TableCell>
                     <TableCell>
@@ -249,8 +271,33 @@ function App() {
                     </TableCell>
                   </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious
+                    onClick={() => paginateLinks(currentPage - 1)}
+                  />
+                </PaginationItem>
+                {numberOfPages > 1 &&
+                  Array.from({ length: numberOfPages }).map((_, index) => (
+                    <PaginationItem
+                      key={index}
+                      onClick={() => paginateLinks(index + 1)}
+                    >
+                      <PaginationLink isActive={currentPage === index + 1}>
+                        {index + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ))}
+                <PaginationItem>
+                  <PaginationNext
+                    onClick={() => paginateLinks(currentPage + 1)}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </main>
