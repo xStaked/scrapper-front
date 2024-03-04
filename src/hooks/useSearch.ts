@@ -43,6 +43,11 @@ export const useSearch = () => {
       ...options,
       showAllLinks: !options.showAllLinks,
     });
+    const newOptions = {
+      ...options,
+      showAllLinks: !options.showAllLinks,
+    };
+    localStorage.setItem("options", JSON.stringify(newOptions));
   };
 
   const handleShowAllLinksWithNoEmails = () => {
@@ -50,12 +55,34 @@ export const useSearch = () => {
       ...options,
       showAllLinksWithNoEmails: !options.showAllLinksWithNoEmails,
     });
+    const newOptions = {
+      ...options,
+      showAllLinksWithNoEmails: !options.showAllLinksWithNoEmails,
+    };
+    localStorage.setItem("options", JSON.stringify(newOptions));
   };
 
   const handleKeepSearching = () => {
     setOptions({
       ...options,
       keepSearching: !options.keepSearching,
+    });
+    const newOptions = {
+      ...options,
+      keepSearching: !options.keepSearching,
+    };
+    localStorage.setItem("options", JSON.stringify(newOptions));
+  };
+
+  const firstLoadOptions = (
+    showAllLinks: boolean,
+    showAllLinksWithNoEmails: boolean,
+    keepSearching: boolean
+  ) => {
+    setOptions({
+      showAllLinks,
+      showAllLinksWithNoEmails,
+      keepSearching,
     });
   };
 
@@ -157,7 +184,7 @@ export const useSearch = () => {
   const copyToClipboardAllEmails = async () => {
     const emails = dataEmails.map((email) => email.email).join(", ");
     await navigator.clipboard.writeText(emails);
-  }
+  };
 
   return {
     dataEmails,
@@ -176,5 +203,6 @@ export const useSearch = () => {
     copyToClipboard,
     handleKeepSearching,
     copyToClipboardAllEmails,
+    firstLoadOptions,
   };
 };

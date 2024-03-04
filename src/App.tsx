@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/pagination";
 import { Label } from "./components/ui/label";
 import { useSearch } from "./hooks/useSearch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 function App() {
   const {
@@ -48,6 +48,7 @@ function App() {
     linksWithNoEmails,
     copyToClipboard,
     copyToClipboardAllEmails,
+    firstLoadOptions,
   } = useSearch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,6 +63,20 @@ function App() {
     if (pageNumber < 1 || pageNumber > numberOfPages) return;
     setCurrentPage(pageNumber);
   };
+
+  useEffect(() => {
+    const options = JSON.parse(localStorage.getItem("options") || "{}");
+
+    if (Object.keys(options).length === 0) {
+      localStorage.setItem("options", JSON.stringify(options));
+    } else {
+      firstLoadOptions(
+        options.showAllLinks,
+        options.showAllLinksWithNoEmails,
+        options.keepSearching
+      );
+    }
+  }, []);
 
   return (
     <>
