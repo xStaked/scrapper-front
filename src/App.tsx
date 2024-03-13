@@ -31,6 +31,7 @@ import {
 import { Label } from "./components/ui/label";
 import { useSearch } from "./hooks/useSearch";
 import { useEffect, useState } from "react";
+import { BlackList } from "./common/BlackList";
 
 function App() {
   const {
@@ -45,7 +46,7 @@ function App() {
     handleKeepSearching,
     links,
     options,
-    linksWithNoEmails,
+    // linksWithNoEmails,
     copyToClipboard,
     copyToClipboardAllEmails,
     firstLoadOptions,
@@ -161,6 +162,10 @@ function App() {
                       className="col-span-1 h-8"
                     />
                   </div>
+                  <div className="grid grid-cols-2 items-center gap-4">
+                    <Label htmlFor="blacklist">Blacklist</Label>
+                    <BlackList />
+                  </div>
                 </div>
               </div>
             </PopoverContent>
@@ -224,7 +229,7 @@ function App() {
             </Table>
           </section>
         )}
-        {linksWithNoEmails.length > 0 && options.showAllLinksWithNoEmails && (
+        {/* {linksWithNoEmails.length > 0 && options.showAllLinksWithNoEmails && (
           <>
             <div className="flex flex-col justify-center items-center gap-4">
               <h2 className="text-2xl font-bold text-center mt-4">
@@ -257,7 +262,7 @@ function App() {
               </Table>
             </div>
           </>
-        )}
+        )} */}
         {links.length > 0 && options.showAllLinks && (
           <div className="flex flex-col justify-center items-center gap-4">
             <h2 className="text-2xl font-bold text-center mt-4">

@@ -126,6 +126,18 @@ export const useSearch = () => {
               return !isDuplicate;
             });
 
+            const blackList = JSON.parse(
+              localStorage.getItem("blacklist") || "[]"
+            );
+
+            // Remove blacklisted emails
+            const filteredEmails = uniqueEmailsInResponse.filter(
+              (email: { email: string }) =>
+                !blackList.some((word: string) => email.email.includes(word))
+            );
+
+            setDataEmails((prev) => [...prev, ...filteredEmails]);
+
             const linksInResponse = data.emails.map(
               (email: data) => email.link
             );
@@ -136,7 +148,7 @@ export const useSearch = () => {
             linksWithNoEmails = [...linksWithNoEmails, ...linksInCurrentLinks];
             collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
 
-            setDataEmails(collectedEmails);
+            // setDataEmails(collectedEmails);
             setLinksWithNoEmails(linksWithNoEmails);
           } else {
             currentLinks.forEach((link) => {
@@ -144,7 +156,6 @@ export const useSearch = () => {
                 linksWithNoEmails.push(link);
               }
             });
-            console.log("entro");
           }
         }
 
