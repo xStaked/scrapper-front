@@ -14,7 +14,7 @@ export const BlackList = () => {
 
   return (
     <Textarea
-      placeholder="Add a domain to the blacklist"
+      placeholder="Agregar palabras a la lista negra"
       value={blacklist.join("\n")}
       onChange={handleChange}
     />
