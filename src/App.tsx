@@ -8,11 +8,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
   Table,
   TableBody,
   TableCell,
@@ -28,10 +23,9 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Label } from "./components/ui/label";
 import { useSearch } from "./hooks/useSearch";
-import { useEffect, useState } from "react";
-import { BlackList } from "./common/BlackList";
+import { useState } from "react";
+import { Options } from "./common/Options";
 
 function App() {
   const {
@@ -41,15 +35,11 @@ function App() {
     searchValues,
     getEmailElements,
     isLoading,
-    handleShowAllLinks,
-    handleShowAllLinksWithNoEmails,
-    handleKeepSearching,
     links,
     options,
     // linksWithNoEmails,
     copyToClipboard,
     copyToClipboardAllEmails,
-    firstLoadOptions,
   } = useSearch();
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -64,20 +54,6 @@ function App() {
     if (pageNumber < 1 || pageNumber > numberOfPages) return;
     setCurrentPage(pageNumber);
   };
-
-  useEffect(() => {
-    const options = JSON.parse(localStorage.getItem("options") || "{}");
-
-    if (Object.keys(options).length === 0) {
-      localStorage.setItem("options", JSON.stringify(options));
-    } else {
-      firstLoadOptions(
-        options.showAllLinks,
-        options.showAllLinksWithNoEmails,
-        options.keepSearching
-      );
-    }
-  }, []);
 
   return (
     <>
@@ -112,64 +88,7 @@ function App() {
             </SelectContent>
           </Select>
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline">Opciones</Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-80">
-              <div className="grid gap-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium leading-none">Options</h4>
-                  <p className="text-sm text-muted-foreground">
-                    Mostrar opciones adicionales
-                  </p>
-                </div>
-                <div className="grid gap-2">
-                  <div className="grid grid-cols-3 items-center gap-2">
-                    <Label htmlFor="showAllLinks">
-                      Mostrar todos los links
-                    </Label>
-                    <Input
-                      id="showAllLinks"
-                      type="checkbox"
-                      defaultChecked
-                      onChange={handleShowAllLinks}
-                      checked={options.showAllLinks}
-                      className="col-span-2 h-8"
-                    />
-                  </div>
-                  <div className="grid grid-cols-3 items-center gap-4">
-                    <Label htmlFor="showAlllinksWithNoEmails">
-                      Mostrar links sin emails
-                    </Label>
-                    <Input
-                      id="showAlllinksWithNoEmails"
-                      type="checkbox"
-                      onChange={handleShowAllLinksWithNoEmails}
-                      checked={options.showAllLinksWithNoEmails}
-                      className="col-span-2 h-8"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label htmlFor="showAlllinksWithNoEmails">
-                      Seguir buscando hasta que se acaben los links
-                    </Label>
-                    <Input
-                      id="showAlllinksWithNoEmails"
-                      type="checkbox"
-                      onChange={handleKeepSearching}
-                      checked={options.keepSearching}
-                      className="col-span-1 h-8"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 items-center gap-4">
-                    <Label htmlFor="blacklist">Blacklist</Label>
-                    <BlackList />
-                  </div>
-                </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+          <Options />
 
           <Button
             variant="secondary"
