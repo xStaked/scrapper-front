@@ -17,6 +17,7 @@ export const useSearch = () => {
     showAllLinks: true,
     showAllLinksWithNoEmails: false,
     keepSearching: false,
+    numberOfPages: 12,
   });
   const [links, setLinks] = useState<string[]>([]);
   const [linksWithNoEmails, setLinksWithNoEmails] = useState<string[]>([]);
@@ -74,15 +75,31 @@ export const useSearch = () => {
     localStorage.setItem("options", JSON.stringify(newOptions));
   };
 
+  const handleNumberOfPages = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setOptions({
+      ...options,
+      numberOfPages: parseInt(value),
+    });
+    const newOptions = {
+      ...options,
+      numberOfPages: parseInt(value),
+    };
+    setOptions({ ...newOptions });
+    localStorage.setItem("options", JSON.stringify(newOptions));
+  };
+
   const firstLoadOptions = (
     showAllLinks: boolean,
     showAllLinksWithNoEmails: boolean,
-    keepSearching: boolean
+    keepSearching: boolean,
+    numberOfPages: number = 12
   ) => {
     setOptions({
       showAllLinks,
       showAllLinksWithNoEmails,
       keepSearching,
+      numberOfPages
     });
   };
 
@@ -92,7 +109,7 @@ export const useSearch = () => {
     linksPerRequest: number = 4
   ) => {
     let collectedEmails: data[] = [];
-    let linksWithNoEmails: string[] = [];
+    // let linksWithNoEmails: string[] = [];
     let hasMoreLinks = true;
 
     if (options.keepSearching) {
@@ -130,26 +147,32 @@ export const useSearch = () => {
               localStorage.getItem("blacklist") || "[]"
             );
 
-            // Remove blacklisted emails
+            // // Remove blacklisted emails
             const filteredEmails = uniqueEmailsInResponse.filter(
               (email: { email: string }) =>
                 !blackList.some((word: string) => email.email.includes(word))
             );
 
-            setDataEmails((prev) => [...prev, ...filteredEmails]);
+            console.log(filteredEmails);
+            if (filteredEmails.length > 0) {
+              collectedEmails = [...collectedEmails, ...filteredEmails];
+            } else {
+              collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
+            }
+            setDataEmails(collectedEmails);
 
-            const linksInResponse = data.emails.map(
-              (email: data) => email.link
-            );
-            const linksInResponseSet = new Set(linksInResponse);
-            const linksInCurrentLinks = currentLinks.filter((link) => {
-              return !linksInResponseSet.has(link);
-            });
-            linksWithNoEmails = [...linksWithNoEmails, ...linksInCurrentLinks];
-            collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
+            // const linksInResponse = data.emails.map(
+            //   (email: data) => email.link
+            // );
+            // const linksInResponseSet = new Set(linksInResponse);
+            // const linksInCurrentLinks = currentLinks.filter((link) => {
+            //   return !linksInResponseSet.has(link);
+            // });
+            // linksWithNoEmails = [...linksWithNoEmails, ...linksInCurrentLinks];
+            // collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
 
             // setDataEmails(collectedEmails);
-            setLinksWithNoEmails(linksWithNoEmails);
+            // setLinksWithNoEmails(linksWithNoEmails);
           } else {
             currentLinks.forEach((link) => {
               if (!linksWithNoEmails.includes(link)) {
@@ -174,14 +197,24 @@ export const useSearch = () => {
       setDataEmails([]);
       setLinks([]);
       setLinksWithNoEmails([]);
+
+      const formatKeywords = JSON.parse(
+        localStorage.getItem("keywords") || "[]"
+      )
+        .map((keyword: string) => keyword.trim().toLowerCase())
+        .toString();
+      const numberOfPages =
+        JSON.parse(localStorage.getItem("options") || "{}").numberOfPages || 15;
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
-          pageCount: 17,
+          pageCount: numberOfPages || 12,
+          keywords: formatKeywords == "," ? "" : formatKeywords,
         },
       });
       setLinks(dataLinks);
       await getEmails(dataLinks, searchValues.limit);
+      console.log(dataEmails);
     } catch (error) {
       console.error(error);
     }
@@ -209,6 +242,7 @@ export const useSearch = () => {
     options,
     handleShowAllLinks,
     handleShowAllLinksWithNoEmails,
+    handleNumberOfPages,
     links,
     linksWithNoEmails,
     copyToClipboard,
