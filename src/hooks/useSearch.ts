@@ -17,7 +17,7 @@ export const useSearch = () => {
     showAllLinks: true,
     showAllLinksWithNoEmails: false,
     keepSearching: false,
-    numberOfPages: 12,
+    numberOfPages: 9,
   });
   const [links, setLinks] = useState<string[]>([]);
   const [linksWithNoEmails, setLinksWithNoEmails] = useState<string[]>([]);
@@ -93,7 +93,7 @@ export const useSearch = () => {
     showAllLinks: boolean,
     showAllLinksWithNoEmails: boolean,
     keepSearching: boolean,
-    numberOfPages: number = 12
+    numberOfPages: number = 10
   ) => {
     setOptions({
       showAllLinks,
@@ -208,7 +208,7 @@ export const useSearch = () => {
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
-          pageCount: numberOfPages || 12,
+          pageCount: numberOfPages || 9,
           keywords: formatKeywords == "," ? "" : formatKeywords,
         },
       });

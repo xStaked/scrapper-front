@@ -112,6 +112,7 @@ export const SearchOptions = () => {
             onChange={handleNumberOfPages}
             value={options.numberOfPages}
             defaultValue="10"
+            min="12"
             className="col-span-1 h-8"
           />
         </div>
