@@ -25,8 +25,8 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useSearch } from "./hooks/useSearch";
+import { SearchOptions } from "@/common/SearchOptions";
 // import { Options } from "./common/Options";
-import { Options } from "./common/Options";
 
 function App() {
   const {
@@ -89,7 +89,7 @@ function App() {
             </SelectContent>
           </Select>
 
-          <Options />
+          <SearchOptions />
 
           <Button
             variant="secondary"
