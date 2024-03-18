@@ -25,7 +25,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useSearch } from "./hooks/useSearch";
-import { SearchOptions } from "./common/SearchOptions";
+import { SearchOptions } from "@/common/SearchOptions";
 // import { Options } from "./common/Options";
 
 function App() {
