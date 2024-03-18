@@ -110,9 +110,13 @@ export const useSearch = () => {
   ) => {
     let collectedEmails: data[] = [];
     // let linksWithNoEmails: string[] = [];
+
     let hasMoreLinks = true;
 
-    if (options.keepSearching) {
+    const keepSearching = JSON.parse(localStorage.getItem("options") || "{}").keepSearching;
+
+    if (keepSearching) {
+      console.log('entro')
       emailCount = 999;
     }
 
@@ -155,6 +159,7 @@ export const useSearch = () => {
 
             console.log(filteredEmails);
             if (filteredEmails.length > 0) {
+              console.log('entro blacklist')
               collectedEmails = [...collectedEmails, ...filteredEmails];
             } else {
               collectedEmails = [...collectedEmails, ...uniqueEmailsInResponse];
@@ -198,18 +203,18 @@ export const useSearch = () => {
       setLinks([]);
       setLinksWithNoEmails([]);
 
-      const formatKeywords = JSON.parse(
-        localStorage.getItem("keywords") || "[]"
-      )
-        .map((keyword: string) => keyword.trim().toLowerCase())
-        .toString();
+      // const formatKeywords = JSON.parse(
+      //   localStorage.getItem("keywords") || "[]"
+      // )
+      //   .map((keyword: string) => keyword.trim().toLowerCase())
+      //   .toString();
       const numberOfPages =
         JSON.parse(localStorage.getItem("options") || "{}").numberOfPages || 15;
       const { data: dataLinks } = await axios.get(`${getLinksUrl}`, {
         params: {
           query: searchValues.search,
           pageCount: numberOfPages || 9,
-          keywords: formatKeywords == "," ? "" : formatKeywords,
+          // keywords: formatKeywords == "," ? "" : formatKeywords,
         },
       });
       setLinks(dataLinks);
