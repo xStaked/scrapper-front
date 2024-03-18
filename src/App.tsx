@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "./components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +25,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { useSearch } from "./hooks/useSearch";
-import { useState } from "react";
+// import { Options } from "./common/Options";
 import { Options } from "./common/Options";
 
 function App() {
